@@ -178,15 +178,14 @@ Mat BuildLinearSytem(long const ny, long const nx, long const nt,
 
 // ********************************************************* //
 
-void getInitial(long const ny, long const nx, long const nt, double const beta,
-		const double* const lhs, const double* const rhs, double* const res)
+void getInitialSolution(long const ny, long const nx, long const nt, double const beta,
+			const double* const lhs, const double* const rhs, double* const res)
 {
-
+  constexpr static long const nSum=2; // +/- from the central pixel
   Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor> tmp(ny,nx);
   
   for(long tt=0; tt<nt;++tt){
 
-    
     Eigen::Map<Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor>>       img(&res[tt*ny*nx],ny,nx);
     Eigen::Map<const Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor>> LHS(&lhs[tt*ny*nx],ny,nx);
     Eigen::Map<const Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor>> RHS(&rhs[tt*ny*nx],ny,nx);
@@ -196,20 +195,21 @@ void getInitial(long const ny, long const nx, long const nt, double const beta,
     
     for(long yy=0;yy<ny; ++yy)
       for(long xx=0;xx<nx; ++xx)
-	tmp(yy,xx) = RHS(yy,xx) / (LHS(yy,xx)+beta);
+	tmp(yy,xx) = RHS(yy,xx) / (LHS(yy,xx) + beta);
 
     
     // --- now use a 3x3 kernel to smooth prediction --- //
 
     for(long yy=0;yy<ny; ++yy){
 
-      long const j0 = std::max<long>(0,   yy-1);
-      long const j1 = std::min<long>(ny-1,yy+1);
+      long const j0 = std::max<long>(0,   yy-nSum);
+      long const j1 = std::min<long>(ny-1,yy+nSum);
       long const nj = j1-j0+1;
       
       for(long xx=0;xx<nx; ++xx){
-	long const i0 = std::max<long>(0,   xx-1);
-	long const i1 = std::min<long>(nx-1,xx+1);
+	
+	long const i0 = std::max<long>(0,   xx-nSum);
+	long const i1 = std::min<long>(nx-1,xx+nSum);
 	long const ni = i1-i0+1;
 	
 	double sum = 0.0;
@@ -219,6 +219,7 @@ void getInitial(long const ny, long const nx, long const nt, double const beta,
 	    sum += tmp(jj,ii);
 
 	img(yy,xx) = sum / double(nj*ni);
+	
       } // xx
     } // yy
   } // tt
@@ -248,15 +249,16 @@ void reg::timeRegularization(long const ny,
   // --- Build the linear system --- //
   
   Mat A = BuildLinearSytem(ny, nx, nt, lhs, alpha_t, alpha_s, beta);
+
   
 
   // --- Get a simple initial solution to minimize iterations --- //
   
-  getInitial(ny,nx,nt,beta,lhs,rhs,res);
+  getInitialSolution(ny,nx,nt,beta,lhs,rhs,res);
   
+
   
-  
-  // --- Solve linear system --- //
+  // --- Solve linear system with BiCGSTAB using an educated initial guess --- //
 
   long const nDat = nt*ny*nx;
   cVecMap B(rhs,nDat);
