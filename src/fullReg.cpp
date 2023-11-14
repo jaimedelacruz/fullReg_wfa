@@ -94,7 +94,7 @@ void reg::centDerMany(long const nPix,
 Mat BuildLinearSytem(long const ny, long const nx, long const nt,
 		     const double* const __restrict__ lhs,
 		     double const alpha_t, double const alpha_s,
-		     double const beta)
+		     double const beta, int const verbose)
 {
 
   long const nDat = ny*nx*nt;
@@ -104,11 +104,13 @@ Mat BuildLinearSytem(long const ny, long const nx, long const nt,
   // --- we will first count the number of elements per row --- //
   
   Eigen::VectorXi n_elements(nDat); n_elements.setConstant(1); // Diagonal term already counted 
+
+  if(verbose){
+    fprintf(stderr,"[info] problem dimensions -> ny=%ld, nx%ld, nt=%ld\n", ny, nx, nt);
+    fprintf(stderr,"[info] counting non-zero elements of sparse matrix with dimensions %ld x %ld ... ", nDat,nDat);
+  }
+
   
-  fprintf(stderr,"[info] problem dimensions -> ny=%ld, nx%ld, nt=%ld\n", ny, nx, nt);
-  fprintf(stderr,"[info] counting non-zero elements of sparse matrix with dimensions %ld x %ld ... ", nDat,nDat);
-
-
   // --- Count non-zero terms --- //
 
   long const ny1 = ny-1;
@@ -139,11 +141,13 @@ Mat BuildLinearSytem(long const ny, long const nx, long const nt,
 
   // --- populate matrix --- //
 
-  fprintf(stderr,"filling non-zero terms in matrix ... ");
+  if(verbose)
+    fprintf(stderr,"filling non-zero terms in matrix ... ");
 
   
   
   // --- Fill matrix --- //
+  
   for(long tt=0; tt<nt; ++tt){
     for(long yy=0; yy<ny; ++yy){
       for(long xx=0; xx<nx; ++xx){
@@ -170,8 +174,9 @@ Mat BuildLinearSytem(long const ny, long const nx, long const nt,
       }
     } // xx
   } // yy
-  
-  fprintf(stderr,"done\n");  
+
+  if(verbose)
+    fprintf(stderr,"done\n");  
   
   return A;
 }
@@ -236,7 +241,8 @@ void reg::timeRegularization(long const ny,
 			     double const alpha_s,
 			     double const beta,
 			     double* const res,
-			     int const nthreads)
+			     int const nthreads,
+			     int const verbose)
 {
 
   // --- Init number of threads --- //
@@ -248,7 +254,7 @@ void reg::timeRegularization(long const ny,
   
   // --- Build the linear system --- //
   
-  Mat A = BuildLinearSytem(ny, nx, nt, lhs, alpha_t, alpha_s, beta);
+  Mat A = BuildLinearSytem(ny, nx, nt, lhs, alpha_t, alpha_s, beta, verbose);
 
   
 
@@ -264,12 +270,14 @@ void reg::timeRegularization(long const ny,
   cVecMap B(rhs,nDat);
   VecMap Res(res,nDat);
 
-  fprintf(stderr,"[info] inverting linear system ... ");
+  if(verbose)
+    fprintf(stderr,"[info] inverting linear system ... ");
 
   Eigen::BiCGSTAB<Mat> solver(A);
-  Res = solver.solveWithGuess(B,Res);
-  
-  fprintf(stderr,"done\n");
+  Res = solver.solveWithGuess(B, Res);
+
+  if(verbose)
+    fprintf(stderr,"done\n");
 
 }
 

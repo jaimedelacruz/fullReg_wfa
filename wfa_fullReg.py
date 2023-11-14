@@ -46,8 +46,10 @@ class line:
 
 # *************************************************************************
 
-def getBlos(wav, obs, sig, line, alpha_time, alpha_spat, beta = 0.0, nthreads=4, Bnorm=300., mask = None):
+def getBlos(wav, obs, sig, line, alpha_time, alpha_spat, beta = 0.0, \
+            nthreads=4, Bnorm=300., mask = None, verbose = True):
 
+    
     # get dimensions
     nt, ny, nx, ns, nw = obs.shape
     
@@ -79,14 +81,21 @@ def getBlos(wav, obs, sig, line, alpha_time, alpha_spat, beta = 0.0, nthreads=4,
             rhs[tt,:,:] += c *der[:,:,ii]*obs[tt,:,:,3,ii] / isig2
 
     Blos = TR.spatial_constraints_spat_time(ny, nx, nt, alpha_time/((nt-1)*Bnorm**2), alpha_spat/(2*Bnorm**2), \
-                                            beta/(2*Bnorm**2), lhs.flatten(), rhs.flatten(), int(nthreads))
+                                            beta/(2*Bnorm**2), lhs.flatten(), rhs.flatten(), int(nthreads), \
+                                            verbose=int(verbose))
     
     return Blos
     
 # *************************************************************************
 
-def getBhorAzi(wav, obs, sig, lin, alpha_time, alpha_spat, beta = 0.0, nthreads=4, Bnorm=300., mask = None, vdop = 0.06):
+def getBhorAzi(wav, obs, sig, lin, alpha_time, alpha_spat, beta = 0.0, \
+               nthreads=4, Bnorm=300., mask = None, vdop = 0.06, verbose=True):
 
+
+    Verbose=1
+    if(verbose is not True):
+        verbose = 0
+    
     # get dimensions
     nt, ny, nx, ns, nw = obs.shape
     
@@ -135,10 +144,12 @@ def getBhorAzi(wav, obs, sig, lin, alpha_time, alpha_spat, beta = 0.0, nthreads=
 
             
     BhorQ_2 = TR.spatial_constraints_spat_time(ny, nx, nt, alpha_time/(4*Bnorm**4), alpha_spat/(4*Bnorm**4), \
-                                               beta/(4*Bnorm**4), lhsQ.flatten(), rhsQ.flatten(), int(nthreads))
+                                               beta/(4*Bnorm**4), lhsQ.flatten(), rhsQ.flatten(), int(nthreads),\
+                                               verbose=int(verbose))
              
     BhorU_2 = TR.spatial_constraints_spat_time(ny, nx, nt, alpha_time/((nt-1)*Bnorm**4), alpha_spat/(4*Bnorm**4), \
-                                               beta/(4*Bnorm**4), lhsU.flatten(), rhsU.flatten(), int(nthreads))
+                                               beta/(4*Bnorm**4), lhsU.flatten(), rhsU.flatten(), int(nthreads),\
+                                               verbose=int(verbose))
 
 
     # calculate the azimuth

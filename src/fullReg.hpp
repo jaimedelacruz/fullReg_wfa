@@ -24,7 +24,8 @@ namespace reg{
 			  double const alpha_s,
 			  double const beta,
 			  double* const res,
-			  int const nthreads);
+			  int const nthreads,
+			  int const verbose);
   
   // ********************************************************* //
 
