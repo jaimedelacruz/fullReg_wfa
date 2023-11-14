@@ -1,6 +1,13 @@
 #ifndef TIMEREGHPP
 #define TIMEREGHPP
+/* ---
+   Fully regularized WFA routines in space and time
 
+   Coded by J. de la Cruz Rodriguez (ISP-SU, 2023)
+   References:
+               de la Cruz Rodriguez & Leenaarts (in prep.)
+	       Morosin, de la Cruz Rodriguez, et al. (2020)
+   --- */
 namespace reg{
   
   // ********************************************************* //
