@@ -6,8 +6,7 @@ while keeping a convenient python interface.
 
 
 ## Compilation of the C++ module
-This module makes use of the Eigen-3 (3.3.7) and FFTW-3 
-libraries, which should be in your path. The compilation has been tested
+This module makes use of the Eigen-3 (3.3.7) library, which should be in your path. The compilation has been tested
 in Linux and Mac systems (with MacPorts).
 
 To compile it simply use:
@@ -24,9 +23,8 @@ simply download the latest stable version and untar it in the pyMilne directory.
 Just rename the eigen-3.3.7 folder to eigen3 and the code should compile.
 
 ## Usage
-We refer to the commented example.py file that is included with the distribution.
-We have also prepared an example with a real SST/CRISP dataset that can be found in the example_CRISP/ folder. Simply run invert_crisp.py. That example is also extensively commented.
-We also have included an example that makes use of the spatially-regularized Levenberg-Marquardt (invert_crisp_spatially_regularized.py).
+We refer to the commented example that is included with the distribution.
+
 
 ## Citing
 These routines were developed and used as part of the study by [de la Cruz Rodriguez & Leenaarts in prep.](bla). If you find these routines useful for your research, I would appreciate it the most if that publication is cited in your paper.
