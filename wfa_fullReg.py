@@ -28,6 +28,11 @@ class line:
             self.j1 = 1.0; self.j2 = 1.0; self.g1 = 1.50; self.g2 = 2.0; self.cw = 5172.6843
         elif(cw == 5896):
             self.j1 = 0.5; self.j2 = 0.5; self.g1 = 2.00; self.g2 = 2.0/3.0; self.cw = 5895.9242
+        elif(cw == 6563):
+            self.cw = 6562.8518
+            self.geff = 1.048 # Casini & Landi Degl'Innocenti (1994)
+            self.Gg = 0.0 # No Q & U data?
+            return
         else:
             print("line::init: ERROR, line not implemented")
             self.j1 = 0.0; self.j2 = 0.0; self.g1 = 0.0; self.g2 = 0.0; self.cw = 0.0
@@ -48,7 +53,25 @@ class line:
 
 def getBlos(wav, obs, sig, line, alpha_time, alpha_spat, beta = 0.0, \
             nthreads=4, Bnorm=300., mask = None, verbose = True):
+    """
+    Computes the Bparallel from the Stokes data.
+    
+    Input: 
+         wav: 1D array with the wavelength offset from line center [Angstroms].
+         obs: 4D [ny,nx,nStokes,nLambda] or 5D [nt,ny,nx,nStokes,nLambda] cube with the data.
+         sig: 2D array [nStokes,nLambda] with the estimate of the noise for each spectral point [float64].
+         lin: line object containing the information of the spectral line (see above).
+  alpha_time: regularization weight in the temporal direction.
+  alpha_spat: regularization weight in the spatial direction.
+        beta: low-norm regularization weight (prefers solution with a lower B amplitude).
+    nthreads: number of threads (int)
+       Bnorm: typical magnetic field strength to scale the regularization terms relative to Chi2.
+        mask: indexes of the wavelengths that we want to use in the calculation (optional).
+     verbose: printout information (or not). Default True.
 
+    Coded by J. de la Cruz Rodriguez (ISP-SU, 2023).
+    
+    """
     
     # get dimensions
     nt, ny, nx, ns, nw = obs.shape
@@ -90,7 +113,26 @@ def getBlos(wav, obs, sig, line, alpha_time, alpha_spat, beta = 0.0, \
 
 def getBhorAzi(wav, obs, sig, lin, alpha_time, alpha_spat, beta = 0.0, \
                nthreads=4, Bnorm=300., mask = None, vdop = 0.06, verbose=True):
+    """
+    Computes the Btrans and the azimuth from the Stokes data
+    
+    Input: 
+         wav: 1D array with the wavelength offset from line center [Angstroms].
+         obs: 4D [ny,nx,nStokes,nLambda] or 5D [nt,ny,nx,nStokes,nLambda] cube with the data.
+         sig: 2D array [nStokes,nLambda] with the estimate of the noise for each spectral point [float64].
+         lin: line object containing the information of the spectral line (see above).
+  alpha_time: regularization weight in the temporal direction.
+  alpha_spat: regularization weight in the spatial direction.
+        beta: low-norm regularization weight (prefers solution with a lower B amplitude).
+    nthreads: number of threads (int)
+       Bnorm: typical magnetic field strength to scale the regularization terms relative to Chi2.
+        mask: indexes of the wavelengths that we want to use in the calculation (optional).
+        vdop: typical Doppler width in Angstroms. The line offsets falling inside +/- vdop will be ignored.
+     verbose: printout information (or not). Default True.
 
+    Coded by J. de la Cruz Rodriguez (ISP-SU, 2023).
+    
+    """
 
     Verbose=1
     if(verbose is not True):
