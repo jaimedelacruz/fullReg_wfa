@@ -1,3 +1,11 @@
+"""
+Fully regularized WFA approximation implementation
+Coded by J. de la Cruz Rodriguez (ISP-SU, 2023)
+
+References:
+de la Cruz Rodriguez & Leenaarts (in prep.)
+Morosin et al. (2020)
+"""
 import WFA_fullReg as TR
 import numpy as np
 
