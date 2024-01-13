@@ -1,3 +1,40 @@
+import matplotlib as m
+#m.use("TkAgg")
+fig_size = (8,6)
+font = 'Liberation Sans'
+params = {'axes.labelsize': 9,
+          'axes.titlesize': 9,
+          'font.size': 8,
+          'legend.fontsize': 9,
+          'font.family': 'sans-serif',
+          'font.sans-serif': font,
+          'xtick.labelsize': 8,
+          'ytick.labelsize': 8,
+          'text.usetex': True,
+          'figure.figsize': fig_size,
+          'figure.dpi': 150,
+          'lines.linewidth': 1.0,
+          'axes.linewidth':1.0,
+          'image.interpolation'  : 'nearest',
+#          'xtick.major.size'     : 5,      # major tick size in points
+#          'xtick.minor.size'     : 3.5,      # minor tick size in points
+#          'xtick.major.width'    : 0.5,    # major tick width in points
+#          'xtick.minor.width'    : 0.3,    # minor tick width in points
+#          'axes.spines.top': False,
+#          'axes.spines.right':False,
+#          'xtick.top': False,
+#          'ytick.right': False,
+#          'axes.formatter.useoffset': False
+}
+m.rcParams.update(params)
+
+m.rcParams['mathtext.fontset'] = 'custom'
+m.rcParams['mathtext.rm'] = font
+m.rcParams['mathtext.it'] = font+':italic'
+m.rcParams['mathtext.bf'] = font+':bold'
+
+
+
 import numpy as np
 import matplotlib.pyplot as plt; plt.ion()
 from astropy.io import fits
@@ -90,11 +127,14 @@ if __name__ == "__main__":
 
     asp = ny/nx
     plt.close("all")
-    f, ax = plt.subplots(nrows=1, ncols=2, figsize=(4+0.2,4*asp/2), sharey=True)
-    
+    f, ax = plt.subplots(nrows=1, ncols=2, figsize=(4+0.2,4*asp/2), sharey=True, dpi=96)
     ext = np.float64((0,nx,0,ny))*0.058
-    ima0 = ax[0].imshow(Blos[0], cmap="gist_gray", vmax=60, vmin=-60, interpolation="nearest", extent=ext)
-    ima1 = ax[1].imshow(BlosReg[0], cmap="gist_gray", vmax=60, vmin=-60, interpolation="nearest", extent=ext)
+    
+    ima0 = ax[0].imshow(Blos[0], cmap="gist_gray", vmax=60, vmin=-60, \
+                        interpolation="nearest", extent=ext, aspect=1)
+    
+    ima1 = ax[1].imshow(BlosReg[0], cmap="gist_gray", vmax=60, vmin=-60, \
+                        interpolation="nearest", extent=ext, aspect=1)
 
     ax[0].set_ylabel("y [arcsec]")
     ax[0].set_xlabel("x [arcsec]")
@@ -107,10 +147,12 @@ if __name__ == "__main__":
     
     # colorbar
     
-    ax1 = f.add_subplot(921)
+    ax1 = f.add_subplot(931)
     tmp1 = ax[0].get_position()
     tmp2 = ax[1].get_position()
+
     pos = (tmp1.x0,0.93,tmp2.x0-tmp1.x0+tmp2.width,0.025)
+    
     ax1.set_position(pos)
     ax1.set_yticks([])
     ax1.set_xticks([-60,-30,0,30,60])
