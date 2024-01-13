@@ -27,7 +27,8 @@ We refer to the commented example that is included with the distribution.
 
 
 ## Citing
-These routines were developed and used as part of the study by [de la Cruz Rodriguez & Leenaarts in prep.](bla). If you find these routines useful for your research, I would appreciate it the most if that publication is cited in your paper.
+These routines were developed and used as part of the study by de la Cruz Rodriguez & Leenaarts (in prep.). If you find these routines useful for your research, I would appreciate it the most if that publication is cited in your paper.
+
 
 ## Acknowledgements
 This project has been funded by the European Union (ERC, MAGHEAT, 101088184). Views and opinions expressed are however those of the author(s) only and do not necessarily reflect those of the European Union or the European Research Council. Neither the European Union nor the granting authority can be held responsible for them.
