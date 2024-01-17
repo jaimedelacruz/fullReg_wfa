@@ -37,7 +37,7 @@ comp_flags=['-Ofast', '-flto','-g0','-fstrict-aliasing','-march=native','-mtune=
 
 
 extension = Extension("WFA_fullReg",
-                      sources=["src/fullREG.pyx", "src/fullReg.cpp"], 
+                      sources=["src/REG.pyx", "src/fullReg.cpp"], 
                       include_dirs=["./","./src/",numpy.get_include(), root_dir+'/include/eigen3/', root_dir+"/include/"],
                       language="c++",
                       extra_compile_args=comp_flags,
