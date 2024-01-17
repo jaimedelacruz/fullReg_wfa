@@ -9,7 +9,7 @@ import platform as plt
 import sys
 import pathlib
 
-os.system('rm WFA_fullReg.*.so src/fullREG.cpp')
+os.system('rm WFA_fullReg.*.so src/REG.cpp')
 p = pathlib.Path(sys.executable)
 root_dir = str(pathlib.Path(*p.parts[0:-2]))
 
