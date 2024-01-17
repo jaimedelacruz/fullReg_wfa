@@ -100,6 +100,7 @@ def getBlos(wav, obs, sig, line, alpha_time, alpha_spat, beta = 0.0, \
     inw = len(mask)
     
     for tt in range(nt):
+        
         StokesI =  np.ascontiguousarray(obs[tt,:,:,0,:].squeeze(), dtype='float64')
         der = TR.getDerivativeMany(np.float64(wav),StokesI, \
                                    nthreads = nthreads)
@@ -111,7 +112,7 @@ def getBlos(wav, obs, sig, line, alpha_time, alpha_spat, beta = 0.0, \
             lhs[tt,:,:] += cc*der[:,:,ii]**2 / isig2
             rhs[tt,:,:] += c *der[:,:,ii]*obs[tt,:,:,3,ii] / isig2
 
-    Blos = TR.spatial_constraints_spat_time(ny, nx, nt, alpha_time/((nt-1)*Bnorm**2), alpha_spat/(2*Bnorm**2), \
+    Blos = TR.spatial_constraints_spat_time(ny, nx, nt, alpha_time/(max(1,nt-1)*Bnorm**2), alpha_spat/(2*Bnorm**2), \
                                             beta/(2*Bnorm**2), lhs.flatten(), rhs.flatten(), int(nthreads), \
                                             verbose=int(verbose))
     
@@ -191,13 +192,12 @@ def getBhorAzi(wav, obs, sig, lin, alpha_time, alpha_spat, beta = 0.0, \
                 rhsQ[tt,:,:] += c*obs[tt,:,:,1,ii]*der[:,:,ii] / isig2Q
                 rhsU[tt,:,:] += c*obs[tt,:,:,2,ii]*der[:,:,ii] / isig2U
 
-
             
-    BhorQ_2 = TR.spatial_constraints_spat_time(ny, nx, nt, alpha_time/(4*Bnorm**4), alpha_spat/(4*Bnorm**4), \
+    BhorQ_2 = TR.spatial_constraints_spat_time(ny, nx, nt, alpha_time/(max(nt-1,1)*Bnorm**4), alpha_spat/(4*Bnorm**4), \
                                                beta/(4*Bnorm**4), lhsQ.flatten(), rhsQ.flatten(), int(nthreads),\
                                                verbose=int(verbose))
              
-    BhorU_2 = TR.spatial_constraints_spat_time(ny, nx, nt, alpha_time/((nt-1)*Bnorm**4), alpha_spat/(4*Bnorm**4), \
+    BhorU_2 = TR.spatial_constraints_spat_time(ny, nx, nt, alpha_time/(max(nt-1,1)*Bnorm**4), alpha_spat/(4*Bnorm**4), \
                                                beta/(4*Bnorm**4), lhsU.flatten(), rhsU.flatten(), int(nthreads),\
                                                verbose=int(verbose))
 
