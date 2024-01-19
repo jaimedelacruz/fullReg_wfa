@@ -68,7 +68,7 @@ void reg::centDer(int const N, const double* const __restrict__ x,
   yp[N-1] = (y[N1]-y[N-2]) / (x[N1]-x[N-2]);
 
   
-  for(int ii=0; ii<N1; ++ii){
+  for(int ii=1; ii<N1; ++ii){
     yp[ii] = harmonic_derivative_Steffen_one(x[ii-1], x[ii], x[ii+1], y[ii-1], y[ii], y[ii+1]);
   }
   
