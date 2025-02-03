@@ -9,6 +9,8 @@
 #include <omp.h>
 #include <Eigen/Core>
 #include <Eigen/Sparse>
+//#include <unsupported/Eigen/IterativeSolvers>
+
 #include <cstdio>
 #include <cmath>
 
@@ -191,24 +193,31 @@ Mat BuildLinearSytem(long const ny, long const nx, long const nt,
 
 // ********************************************************* //
 
-void getInitialSolution(long const ny, long const nx, long const nt, double const beta,
+void getInitialSolution(long const ny, long const nx, long const nt, double const beta_in,
 			const double* const lhs, const double* const rhs, double* const res)
 {
-  constexpr static long const nSum=2; // +/- from the central pixel
+  constexpr static long const nSum=1; // +/- from the central pixel
   Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor> tmp(ny,nx);
+
+  constexpr const double psf[3][3] = {{0.0625,0.125,0.0625}, {0.125,0.25,0.125},{0.0625,0.125,0.0625}};
+
+  double const beta = std::max(beta_in, 5.0E-15);
+  
   
   for(long tt=0; tt<nt;++tt){
 
-    Eigen::Map<Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor>>       img(&res[tt*ny*nx],ny,nx);
     Eigen::Map<const Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor>> LHS(&lhs[tt*ny*nx],ny,nx);
     Eigen::Map<const Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor>> RHS(&rhs[tt*ny*nx],ny,nx);
+    Eigen::Map<Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor>> img(&res[tt*ny*nx],ny,nx);
 
     
     // --- Use as initial result the unconstrained solution, using beta --- //
     
     for(long yy=0;yy<ny; ++yy)
-      for(long xx=0;xx<nx; ++xx)
+      for(long xx=0;xx<nx; ++xx){
 	tmp(yy,xx) = RHS(yy,xx) / (LHS(yy,xx) + beta);
+      }
+
 
     
     // --- now use a 3x3 kernel to smooth prediction --- //
@@ -228,14 +237,15 @@ void getInitialSolution(long const ny, long const nx, long const nt, double cons
 	double sum = 0.0;
 	
 	for(long jj=j0; jj<=j1; ++jj)
-	  for(long ii=i0; ii<=i1; ++ii)
-	    sum += tmp(jj,ii);
-
-	img(yy,xx) = sum / double(nj*ni);
+	  for(long ii=i0; ii<=i1; ++ii){
+	    sum += tmp(jj,ii)*psf[jj-yy+1][ii-xx+1];
+	  }
+	img(yy,xx) = sum;
 	
       } // xx
-    } // yy
+    } // yy    
   } // tt
+  
 }
 
 // ********************************************************* //
@@ -281,9 +291,10 @@ void reg::timeRegularization(long const ny,
   if(verbose)
     fprintf(stderr,"[info] inverting linear system ... ");
 
-  Eigen::BiCGSTAB<Mat> solver(A);
+  Eigen::BiCGSTAB<Mat> solver(A);  
   Res = solver.solveWithGuess(B, Res);
-
+  
+  
   if(verbose)
     fprintf(stderr,"done\n");
 
