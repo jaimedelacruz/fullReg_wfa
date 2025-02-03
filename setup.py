@@ -14,11 +14,18 @@ p = pathlib.Path(sys.executable)
 root_dir = str(pathlib.Path(*p.parts[0:-2]))
 
 
+# Optimization flags. With M-processor Macs remove the -march=native!
+
+comp_flags=['-O3', '-flto','-g0','-fstrict-aliasing','-mtune=native', '-march=native',\
+            '-std=c++20','-fPIC','-fopenmp', '-I./src', "-DNPY_NO_DEPRECATED_API", '-DNDEBUG', \
+            '-pedantic', '-Wall']
+
 if(plt.system() == 'Darwin'):
-    root_dir = '/Users/jade0464/miniforge3/' # using this one if macports are installed
+    root_dir = '/opt/local/' # using this one if macports are installed
     CC = 'clang'
     CXX= 'clang++'
     link_opts = ["-stdlib=libc++","-bundle","-undefined","dynamic_lookup", "-fopenmp","-lgomp"]
+    comp_flags.append('-mcpu=native')
 else:
     root_dir = '/usr/'
     CC = 'gcc'
@@ -29,11 +36,7 @@ os.environ["CC"] = CC
 os.environ["CXX"] = CXX
 
 
-# Optimization flags. With M-processor Macs remove the -march=native!
 
-comp_flags=['-O3', '-flto','-g0','-fstrict-aliasing','-mcpu=native','-mtune=native',\
-            '-std=c++20','-fPIC','-fopenmp', '-I./src', "-DNPY_NO_DEPRECATED_API", '-DNDEBUG', \
-            '-pedantic', '-Wall']
 
 
 extension = Extension("WFA_fullReg",
