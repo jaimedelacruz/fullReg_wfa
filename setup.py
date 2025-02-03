@@ -15,7 +15,7 @@ root_dir = str(pathlib.Path(*p.parts[0:-2]))
 
 
 if(plt.system() == 'Darwin'):
-    root_dir = '/opt/local/' # using this one if macports are installed
+    root_dir = '/Users/jade0464/miniforge3/' # using this one if macports are installed
     CC = 'clang'
     CXX= 'clang++'
     link_opts = ["-stdlib=libc++","-bundle","-undefined","dynamic_lookup", "-fopenmp","-lgomp"]
@@ -31,7 +31,7 @@ os.environ["CXX"] = CXX
 
 # Optimization flags. With M-processor Macs remove the -march=native!
 
-comp_flags=['-Ofast', '-flto','-g0','-fstrict-aliasing','-march=native','-mtune=native',\
+comp_flags=['-O3', '-flto','-g0','-fstrict-aliasing','-mcpu=native','-mtune=native',\
             '-std=c++20','-fPIC','-fopenmp', '-I./src', "-DNPY_NO_DEPRECATED_API", '-DNDEBUG', \
             '-pedantic', '-Wall']
 
